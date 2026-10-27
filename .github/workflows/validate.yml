@@ -95,4 +95,9 @@ jobs:
             plugins
             skills/pgx
       - name: Compare with plugins/sync.sh --standalone
-        run: canonical/plugins/sync.sh --check-standalone "$PWD/standalone"
+        run: |
+          # The old sync.sh ignored unknown arguments and exited 0: require the mode, so
+          # this job cannot pass vacuously against a main that lacks it.
+          grep -q -- '--check-standalone' canonical/plugins/sync.sh \
+            || { echo "::error::pgrundev/pgx main: plugins/sync.sh has no --check-standalone mode (not merged yet?)" >&2; exit 1; }
+          canonical/plugins/sync.sh --check-standalone "$PWD/standalone"
