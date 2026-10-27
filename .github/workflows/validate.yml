@@ -56,8 +56,9 @@ jobs:
           e = [x for x in m["plugins"] if x["name"] == "pgx"]
           assert m["name"] == "pgx-plugin" and len(e) == 1 and e[0]["source"] == "./" and "version" not in e[0], m
           PY
-          ! grep -rnE 'postgres(ql)?://[^*$"<` ]+:[^*$"<` ]+@' --exclude-dir=.git . | grep -v '\.\.\.' | grep -v '…' | grep -v ':\*\*\*@' || { echo "credentialed URL" >&2; exit 1; }
-          ! grep -rnE '(sk-ant-|ghp_[A-Za-z0-9]{20}|AKIA[0-9A-Z]{16}|npm_[A-Za-z0-9]{30}|-----BEGIN [A-Z ]*PRIVATE KEY)' --exclude-dir=.git . || { echo "secret-like token" >&2; exit 1; }
+          # (the plugin files only: this workflow carries the patterns it looks for)
+          ! grep -rnE 'postgres(ql)?://[^*$"<` ]+:[^*$"<` ]+@' --exclude-dir=.git --exclude-dir=.github . | grep -v '\.\.\.' | grep -v '…' | grep -v ':\*\*\*@' || { echo "credentialed URL" >&2; exit 1; }
+          ! grep -rnE '(sk-ant-|ghp_[A-Za-z0-9]{20}|AKIA[0-9A-Z]{16}|npm_[A-Za-z0-9]{30}|-----BEGIN [A-Z ]*PRIVATE KEY)' --exclude-dir=.git --exclude-dir=.github . || { echo "secret-like token" >&2; exit 1; }
       - name: Helper scripts execute
         run: |
           bash skills/pgx/scripts/detect-project.sh . | python3 -c 'import json,sys; json.load(sys.stdin)'
